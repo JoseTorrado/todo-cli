@@ -100,7 +100,7 @@ func TestDelete(t *testing.T) {
 	}
 }
 
-func TestExtract(t *testing.T) {
+func TestLoad(t *testing.T) {
 	// Arrange
 	// Create a temp file to read from
 	tempFile, err := os.CreateTemp("", "todos.json")
@@ -124,11 +124,18 @@ func TestExtract(t *testing.T) {
 
 	// Action
 	var extractedTodos todo.Todos
-	err = extractedTodos.Extract(tempFile.Name())
+	err = extractedTodos.Load(tempFile.Name())
 
 	// Assert
 	if len(extractedTodos) != 2 {
 		t.Errorf("Expected 2 todos but got %d", len(extractedTodos))
 	}
 
+	// Verify the todos were extracted properly
+	if extractedTodos[0].Task != "Task 1" || extractedTodos[1].Task != "Task 2" {
+		t.Errorf("unexpected tasks: %+v", extractedTodos)
+	}
+	if extractedTodos[0].Done != false || extractedTodos[1].Done != true {
+		t.Errorf("unexpected done statuses: %+v", extractedTodos)
+	}
 }

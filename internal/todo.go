@@ -54,7 +54,7 @@ func (t *Todos) Delete(index int) error {
 	return nil
 }
 
-func (t *Todos) Extract(filename string) error {
+func (t *Todos) Load(filename string) error {
 	file, err := os.ReadFile(filename)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
@@ -73,4 +73,14 @@ func (t *Todos) Extract(filename string) error {
 	}
 
 	return nil
+}
+
+func (t *Todos) Save(filename string) error {
+
+	data, err := json.Marshal(t)
+	if err != nil {
+		return err
+	}
+
+	return os.WriteFile(filename, data, 0644)
 }
