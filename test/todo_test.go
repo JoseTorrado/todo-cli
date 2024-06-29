@@ -1,0 +1,100 @@
+package test
+
+import (
+	"testing"
+	"time"
+
+	todo "github.com/JoseTorrado/todo-cli/internal"
+)
+
+func TestAdd(t *testing.T) {
+	// Arrange
+	var todos todo.Todos
+	task := "Test Task"
+
+	// Action
+	todos.Add(task)
+
+	// Assert
+	if len(todos) != 1 {
+		t.Errorf("expected 1 todo but got %d", len(todos))
+	}
+
+	addedTask := todos[0]
+
+	if addedTask.Task != task {
+		t.Errorf("Expected task to be %q but got %q", task, addedTask.Task)
+	}
+
+	if addedTask.Done != false {
+		t.Errorf("Expected Done to be fasle but got %v", addedTask.Done)
+	}
+
+	if addedTask.CreatedAt.IsZero() {
+		t.Errorf("Expected CreatedAt to be set but got zero value")
+	}
+
+	if !addedTask.CompletedAt.IsZero() {
+		t.Errorf("Expected CompletedAt to be set but got zero value")
+	}
+}
+
+func TestComplete(t *testing.T) {
+	//Arrange
+	todos := todo.Todos{
+		{Task: "Task 1", Done: false, CreatedAt: time.Now(), CompletedAt: time.Time{}},
+		{Task: "Task 2", Done: false, CreatedAt: time.Now(), CompletedAt: time.Time{}},
+	}
+
+	// Action
+	err := todos.Complete(1)
+
+	// Assert
+	if err != nil {
+		t.Fatalf("Expected no error but got %v", err)
+	}
+
+	if !todos[0].Done {
+		t.Errorf("Expected Done to be true but got %v", todos[0].Done)
+	}
+
+	if todos[0].CompletedAt.IsZero() {
+		t.Error("Expected CompletedAt to be set byt for a zero value")
+	}
+
+	// Testing out of bounds
+	err = todos.Complete(3)
+	if err == nil {
+		t.Error("Expected Error but got nil")
+	}
+
+	if err.Error() != "Invalid Index" {
+		t.Errorf("Epected error bessage 'Invalid Index' but got %v", err.Error())
+	}
+}
+
+func TestDelete(t *testing.T) {
+	// Arrange
+	todos := todo.Todos{
+		{Task: "Task 1", Done: false, CreatedAt: time.Now(), CompletedAt: time.Time{}},
+		{Task: "Task 2", Done: false, CreatedAt: time.Now(), CompletedAt: time.Time{}},
+	}
+
+	// Action
+	err := todos.Delete(1)
+
+	// Assert
+	if len(todos) != 1 {
+		t.Errorf("expected 1 todo after deletion but got %d", len(todos))
+	}
+
+	// Testing out of bounds
+	err = todos.Delete(2)
+	if err == nil {
+		t.Error("Expected Error but got nil")
+	}
+
+	if err.Error() != "Invalid Index" {
+		t.Errorf("Epected error bessage 'Invalid Index' but got %v", err.Error())
+	}
+}
