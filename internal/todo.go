@@ -2,7 +2,9 @@
 package todo
 
 import (
+	"encoding/json"
 	"errors"
+	"os"
 	"time"
 )
 
@@ -48,6 +50,27 @@ func (t *Todos) Delete(index int) error {
 	}
 
 	*t = append(ls[:index-1], ls[index:]...) // ... unpacks the slice to be appended so the append function can add them to the first slice
+
+	return nil
+}
+
+func (t *Todos) Extract(filename string) error {
+	file, err := os.ReadFile(filename)
+	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			return nil
+		}
+		return err
+	}
+
+	if len(file) == 0 {
+		return nil
+	}
+
+	err = json.Unmarshal(file, t)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

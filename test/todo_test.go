@@ -1,6 +1,7 @@
 package test
 
 import (
+	"os"
 	"testing"
 	"time"
 
@@ -97,4 +98,37 @@ func TestDelete(t *testing.T) {
 	if err.Error() != "Invalid Index" {
 		t.Errorf("Epected error bessage 'Invalid Index' but got %v", err.Error())
 	}
+}
+
+func TestExtract(t *testing.T) {
+	// Arrange
+	// Create a temp file to read from
+	tempFile, err := os.CreateTemp("", "todos.json")
+	if err != nil {
+		t.Fatalf("Failed to create temp file: %v", err)
+	}
+
+	// Schedule removal of temp file after test runs
+	defer os.Remove(tempFile.Name())
+
+	// Write Data to JSON
+	jsonData := `[{"Task":"Task 1", "Done":false},{"Task":"Task 2", "Done":true}]`
+	if _, err := tempFile.Write([]byte(jsonData)); err != nil {
+		t.Fatalf("Failed to write to temp file: %v", err)
+	}
+
+	// Close file after write
+	if err := tempFile.Close(); err != nil {
+		t.Fatalf("Failed to close temp file: %v", err)
+	}
+
+	// Action
+	var extractedTodos todo.Todos
+	err = extractedTodos.Extract(tempFile.Name())
+
+	// Assert
+	if len(extractedTodos) != 2 {
+		t.Errorf("Expected 2 todos but got %d", len(extractedTodos))
+	}
+
 }
