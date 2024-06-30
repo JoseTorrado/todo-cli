@@ -4,17 +4,28 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
-	"github.com/JoseTorrado/todo-cli/internal/todo"
 	"io"
 	"os"
+	"os/user"
+	"path/filepath"
 	"strings"
+
+	"github.com/JoseTorrado/todo-cli/internal/todo"
 )
 
 const (
-	todoFile = ".todos.json"
+	todoFileName = ".todos.json"
 )
 
 func main() {
+
+	// Flexible way to get the same file in the home directory
+	usr, err := user.Current()
+	if err != nil {
+		fmt.Println("Error getting current user:", err)
+		return
+	}
+	todoFile := filepath.Join(usr.HomeDir, todoFileName)
 
 	add := flag.Bool("add", false, "add a new todo")
 	complete := flag.Int("complete", 0, "mark a todo as Completed")
