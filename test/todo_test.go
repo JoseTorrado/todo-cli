@@ -1,11 +1,10 @@
 package test
 
 import (
+	"github.com/JoseTorrado/todo-cli/internal/todo"
 	"os"
 	"testing"
 	"time"
-
-	todo "github.com/JoseTorrado/todo-cli/internal"
 )
 
 func TestAdd(t *testing.T) {
