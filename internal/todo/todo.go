@@ -106,19 +106,21 @@ func (t *Todos) Print() {
 	for index, item := range *t {
 		// TODO: Add logic to only print Todos that are Pending OR Created within last 24 hours
 		index++
-		task := blue(item.Task)
-		done := blue("No")
-		if item.Done {
-			task = green(fmt.Sprintf("\u2705 %s", item.Task))
-			done = green("Yes")
+		if !item.Done || (item.Done && item.CompletedAt.After(time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 0, 0, 0, 0, time.Now().Location()))) {
+			task := blue(item.Task)
+			done := blue("No")
+			if item.Done {
+				task = green(fmt.Sprintf("\u2705 %s", item.Task))
+				done = green("Yes")
+			}
+			cells = append(cells, *&[]*simpletable.Cell{
+				{Text: fmt.Sprintf("%d", index)},
+				{Text: task},
+				{Text: done},
+				{Text: item.CreatedAt.Format(time.RFC822)},
+				{Text: item.CompletedAt.Format(time.RFC822)},
+			})
 		}
-		cells = append(cells, *&[]*simpletable.Cell{
-			{Text: fmt.Sprintf("%d", index)},
-			{Text: task},
-			{Text: done},
-			{Text: item.CreatedAt.Format(time.RFC822)},
-			{Text: item.CompletedAt.Format(time.RFC822)},
-		})
 	}
 
 	table.Body = &simpletable.Body{Cells: cells}
@@ -144,7 +146,16 @@ func (t *Todos) CountPending() int {
 
 // TODO: Add a function that can print the items COMPLETED YESTERDAY for my daily standup message
 func (t *Todos) PrintStandup() {
+	today := time.Now()
+
+	yesterdayStart := time.Date(today.Year(), today.Month(), today.Day()-1, 0, 0, 0, 0, today.Location())
+	yesterdayEnd := yesterdayStart.AddDate(0, 0, 1).Add(-time.Nanosecond) // Yesterday + 1 Day - 1 Nanosecond = Yesterday last hour
+
+	fmt.Println("Yesterday:")
+
 	for _, item := range *t {
-		fmt.Printf("* %s\n", item.Task)
+		if item.Done && item.CompletedAt.After(yesterdayStart) && item.CompletedAt.Before(yesterdayEnd) {
+			fmt.Printf("* %s\n", item.Task)
+		}
 	}
 }

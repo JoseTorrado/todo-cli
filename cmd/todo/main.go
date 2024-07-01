@@ -31,6 +31,7 @@ func main() {
 	complete := flag.Int("done", 0, "Mark a todo as Completed")
 	del := flag.Int("rm", 0, "Delete a todo")
 	list := flag.Bool("ls", false, "List all the todos")
+	standup := flag.Bool("standup", false, "Print all tasks completed yesterday")
 
 	flag.Parse()
 
@@ -85,6 +86,9 @@ func main() {
 
 	case *list:
 		todos.Print()
+
+	case *standup:
+		todos.PrintStandup()
 
 	default:
 		fmt.Fprintln(os.Stdout, "invalid command passed")
