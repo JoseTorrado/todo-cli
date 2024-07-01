@@ -117,7 +117,7 @@ func (t *Todos) Print() {
 			{Text: task},
 			{Text: done},
 			{Text: item.CreatedAt.Format(time.RFC822)},
-			{Text: item.CreatedAt.Format(time.RFC822)},
+			{Text: item.CompletedAt.Format(time.RFC822)},
 		})
 	}
 
