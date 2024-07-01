@@ -36,9 +36,9 @@ to your `PATH` environment variable in your `.bashrc`, `.zshrc`, etc. I will lea
 -add: Adds a todo to the list
   todo -add Add a new Todo
 
--complete: Changes the status of a todo to complete. Receives the index of the task to change
-  todo -complete=1
+-done: Changes the status of a todo to complete. Receives the index of the task to change
+  todo -complete 1
 
--delete: Deletes a todo from the list. Receives the index of the task to delete
-  todo -delete=1
+-rm: Deletes a todo from the list. Receives the index of the task to delete
+  todo -delete 1
 ```

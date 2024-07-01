@@ -27,9 +27,9 @@ func main() {
 	}
 	todoFile := filepath.Join(usr.HomeDir, todoFileName)
 
-	add := flag.Bool("add", false, "add a new todo")
-	complete := flag.Int("complete", 0, "mark a todo as Completed")
-	del := flag.Int("delete", 0, "delete a todo")
+	add := flag.Bool("add", false, "Add a new todo")
+	complete := flag.Int("done", 0, "Mark a todo as Completed")
+	del := flag.Int("rm", 0, "Delete a todo")
 	list := flag.Bool("ls", false, "List all the todos")
 
 	flag.Parse()
