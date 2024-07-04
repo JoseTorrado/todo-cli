@@ -110,7 +110,7 @@ func (t *Todos) Print() {
 			task := blue(item.Task)
 			done := blue("No")
 			if item.Done {
-				task = green(fmt.Sprintf("\u2705 %s", item.Task))
+				task = green(fmt.Sprintf("* %s", item.Task))
 				done = green("Yes")
 			}
 			cells = append(cells, *&[]*simpletable.Cell{
