@@ -1,5 +1,17 @@
-run/todo:
-	@go run ./cmd/todo
+.PHONY: todo test build clean
 
-run/test:
-	@go test ./test
+# Run the todo app
+todo:
+	go run ./cmd/todo
+
+# Run tests
+test:
+	go test ./test -v
+
+# Build app into binary
+build:
+	go build -o todo
+
+# Run clean
+clean:
+	go clean
