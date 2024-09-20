@@ -104,7 +104,6 @@ func (t *Todos) Print() {
 	var cells [][]*simpletable.Cell
 
 	for index, item := range *t {
-		// TODO: Add logic to only print Todos that are Pending OR Created within last 24 hours
 		index++
 		if !item.Done || (item.Done && item.CompletedAt.After(time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 0, 0, 0, 0, time.Now().Location()))) {
 			task := blue(item.Task)
@@ -144,18 +143,28 @@ func (t *Todos) CountPending() int {
 	return total
 }
 
-// TODO: Add a function that can print the items COMPLETED YESTERDAY for my daily standup message
-func (t *Todos) PrintStandup() {
-	today := time.Now()
+func (t *Todos) GetStandupTasks(currentTime time.Time) ([]string, time.Time) {
+	// Get the current day
+	weekday := currentTime.Weekday()
 
-	yesterdayStart := time.Date(today.Year(), today.Month(), today.Day()-1, 0, 0, 0, 0, today.Location())
-	yesterdayEnd := yesterdayStart.AddDate(0, 0, 1).Add(-time.Nanosecond) // Yesterday + 1 Day - 1 Nanosecond = Yesterday last hour
+	var lookbackDays int
+	if weekday == time.Monday {
+		// If it is a Monday, look back 3 day
+		lookbackDays = 3
+	} else {
+		// Any other day, just use 1 day
+		lookbackDays = 1
+	}
+	lookbackDate := currentTime.AddDate(0, 0, -lookbackDays)
+	lookbackStart := time.Date(lookbackDate.Year(), lookbackDate.Month(), lookbackDate.Day(), 0, 0, 0, 0, lookbackDate.Location())
+	lookbackEnd := lookbackStart.AddDate(0, 0, 1).Add(-time.Nanosecond)
 
-	fmt.Println("Yesterday:")
-
+	var tasks []string
 	for _, item := range *t {
-		if item.Done && item.CompletedAt.After(yesterdayStart) && item.CompletedAt.Before(yesterdayEnd) {
-			fmt.Printf("* %s\n", item.Task)
+		if item.Done && item.CompletedAt.After(lookbackStart) && item.CompletedAt.Before(lookbackEnd) {
+			tasks = append(tasks, item.Task)
 		}
 	}
+
+	return tasks, lookbackDate
 }

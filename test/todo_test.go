@@ -1,10 +1,11 @@
 package test
 
 import (
-	"github.com/JoseTorrado/todo-cli/internal/todo"
 	"os"
 	"testing"
 	"time"
+
+	"github.com/JoseTorrado/todo-cli/internal/todo"
 )
 
 func TestAdd(t *testing.T) {
@@ -136,5 +137,75 @@ func TestLoad(t *testing.T) {
 	}
 	if extractedTodos[0].Done != false || extractedTodos[1].Done != true {
 		t.Errorf("unexpected done statuses: %+v", extractedTodos)
+	}
+}
+
+func TestGetStandupTasks_Monday(t *testing.T) {
+	// Mocking the current time to simulate a Monday
+	mockMonday := time.Date(2024, 9, 16, 0, 0, 0, 0, time.UTC) // A Monday
+
+	// Create tasks with different completion times
+	todos := todo.Todos{
+		{Task: "Task 1", Done: true, CompletedAt: time.Date(2024, 9, 13, 14, 0, 0, 0, time.UTC)},  // Completed on Friday
+		{Task: "Task 2", Done: true, CompletedAt: time.Date(2024, 9, 14, 12, 0, 0, 0, time.UTC)},  // Completed on Saturday
+		{Task: "Task 3", Done: false, CompletedAt: time.Date(2024, 9, 13, 11, 0, 0, 0, time.UTC)}, // Not Done
+	}
+
+	// Run the GetStandupTasks function with mockMonday
+	tasks, lookbackDate := todos.GetStandupTasks(mockMonday)
+
+	// Define the expected output
+	expectedTasks := []string{"Task 1"}
+	expectedLookbackDate := time.Date(2024, 9, 13, 0, 0, 0, 0, time.UTC) // Friday
+
+	// Validate the lookback date
+	if !lookbackDate.Equal(expectedLookbackDate) {
+		t.Errorf("Expected lookback date %v but got %v", expectedLookbackDate, lookbackDate)
+	}
+
+	// Validate the tasks
+	if len(tasks) != len(expectedTasks) {
+		t.Errorf("Expected %d tasks but got %d", len(expectedTasks), len(tasks))
+	}
+
+	for i, task := range tasks {
+		if task != expectedTasks[i] {
+			t.Errorf("Expected task %q but got %q", expectedTasks[i], task)
+		}
+	}
+}
+
+func TestGetStandupTasks_RegularDay(t *testing.T) {
+	// Mocking the current time to simulate a Wednesday
+	mockWednesday := time.Date(2024, 9, 18, 0, 0, 0, 0, time.UTC) // A Wednesday
+
+	// Create tasks with different completion times
+	todos := todo.Todos{
+		{Task: "Task 1", Done: true, CompletedAt: time.Date(2024, 9, 17, 14, 0, 0, 0, time.UTC)},  // Completed on Tuesday
+		{Task: "Task 2", Done: true, CompletedAt: time.Date(2024, 9, 16, 12, 0, 0, 0, time.UTC)},  // Completed on Monday
+		{Task: "Task 3", Done: false, CompletedAt: time.Date(2024, 9, 17, 11, 0, 0, 0, time.UTC)}, // Not Done
+	}
+
+	// Run the GetStandupTasks function with mockWednesday
+	tasks, lookbackDate := todos.GetStandupTasks(mockWednesday)
+
+	// Define the expected output
+	expectedTasks := []string{"Task 1"}
+	expectedLookbackDate := time.Date(2024, 9, 17, 0, 0, 0, 0, time.UTC) // Tuesday
+
+	// Validate the lookback date
+	if !lookbackDate.Equal(expectedLookbackDate) {
+		t.Errorf("Expected lookback date %v but got %v", expectedLookbackDate, lookbackDate)
+	}
+
+	// Validate the tasks
+	if len(tasks) != len(expectedTasks) {
+		t.Errorf("Expected %d tasks but got %d", len(expectedTasks), len(tasks))
+	}
+
+	for i, task := range tasks {
+		if task != expectedTasks[i] {
+			t.Errorf("Expected task %q but got %q", expectedTasks[i], task)
+		}
 	}
 }

@@ -9,6 +9,7 @@ import (
 	"os/user"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/JoseTorrado/todo-cli/internal/todo"
 )
@@ -88,7 +89,19 @@ func main() {
 		todos.Print()
 
 	case *standup:
-		todos.PrintStandup()
+		tasks, lookbackDate := todos.GetStandupTasks(time.Now())
+
+		// Print the lookback date
+		fmt.Printf("%s:\n", lookbackDate.Format("2006-01-02"))
+
+		// Loop through the tasks and print them
+		if len(tasks) == 0 {
+			fmt.Println("No tasks recorded.")
+		} else {
+			for _, task := range tasks {
+				fmt.Printf("* %s\n", task)
+			}
+		}
 
 	default:
 		fmt.Fprintln(os.Stdout, "invalid command passed")

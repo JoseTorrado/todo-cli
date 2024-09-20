@@ -10,7 +10,7 @@ test:
 
 # Build app into binary
 build:
-	go build -o todo
+	go build -o ./bin/todo ./cmd/todo
 
 # Run clean
 clean:
