@@ -168,3 +168,15 @@ func (t *Todos) GetStandupTasks(currentTime time.Time) ([]string, time.Time) {
 
 	return tasks, lookbackDate
 }
+
+func (t *Todos) GetTasks(currentTime time.Time) ([]string, time.Time) {
+
+	var tasks []string
+	for _, item := range *t {
+		if !item.Done {
+			tasks = append(tasks, item.Task)
+		}
+	}
+
+	return tasks, currentTime
+}

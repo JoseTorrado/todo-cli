@@ -33,6 +33,7 @@ func main() {
 	del := flag.Int("rm", 0, "Delete a todo")
 	list := flag.Bool("ls", false, "List all the todos")
 	standup := flag.Bool("standup", false, "Print all tasks completed yesterday")
+	today := flag.Bool("today", false, "Print all tasks leftover for today")
 
 	flag.Parse()
 
@@ -93,6 +94,21 @@ func main() {
 
 		// Print the lookback date
 		fmt.Printf("%s:\n", lookbackDate.Format("2006-01-02"))
+
+		// Loop through the tasks and print them
+		if len(tasks) == 0 {
+			fmt.Println("No tasks recorded.")
+		} else {
+			for _, task := range tasks {
+				fmt.Printf("* %s\n", task)
+			}
+		}
+
+	case *today:
+		tasks, currentDate := todos.GetTasks(time.Now())
+
+		// Print the lookback date
+		fmt.Printf("%s:\n", currentDate.Format("2006-01-02"))
 
 		// Loop through the tasks and print them
 		if len(tasks) == 0 {
