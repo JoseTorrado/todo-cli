@@ -12,6 +12,7 @@ import (
 )
 
 type item struct {
+	ID          int
 	Task        string
 	Done        bool
 	CreatedAt   time.Time

@@ -2,7 +2,7 @@ package todo
 
 import (
 	"database/sql"
-	"os"
+	_ "github.com/mattn/go-sqlite3"
 	"time"
 )
 
@@ -58,4 +58,78 @@ func (db *DB) CompleteTodo(id int) error {
 		`, time.Now(), id)
 
 	return err
+}
+
+func (db *DB) DeleteTodo(id int) error {
+	_, err := db.Exec(`
+		DELETE FROM todos WHERE id = ?
+		`, id)
+	return err
+}
+
+func (db *DB) GetAllTodos() ([]item, error) {
+	rows, err := db.Query(`
+		SELECT
+			id,
+			task,
+			done,
+			created_at,
+			completed_at
+		FROM
+			todos
+		`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var todos []item
+	for rows.Next() {
+		var i item
+		var completedAt sql.NullTime
+		err := rows.Scan(&i.ID, &i.Task, &i.Done, &i.CreatedAt, &completedAt)
+		if err != nil {
+			return nil, err
+		}
+		if completedAt.Valid {
+			i.CompletedAt = completedAt.Time
+		}
+		todos = append(todos, i)
+	}
+	return todos, nil
+}
+
+func (db *DB) GetCompletedTodos(since time.Time) ([]item, error) {
+	rows, err := db.Query(`
+		SELECT 
+		id, 
+		task,
+		done,
+		created_at,
+		completedAt
+		FROM 
+		todos
+		WHERE
+		done = 1 
+		AND completed_at > ?
+		`, since)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var todos []item
+	for rows.Next() {
+		var i item
+		var completedAt sql.NullTime
+		err := rows.Scan(&i.ID, &i.Task, &i.Done, &i.CreatedAt, &completedAt)
+		if err != nil {
+			return nil, err
+		}
+		if completedAt.Valid {
+			i.CompletedAt = completedAt.Time
+		}
+		todos = append(todos, i)
+	}
+	return todos, nil
 }
