@@ -40,7 +40,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	// INitialize the DB
+	// Initialize the DB
 	db, err := todo.NewDB(dbPath)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Error intializing the databsae: ", err)
@@ -48,7 +48,7 @@ func main() {
 	}
 	defer db.Close()
 
-	// INitialize the Schema
+	// Initialize the Schema
 	if err := db.InitSchema(); err != nil {
 		fmt.Fprintln(os.Stderr, "Error intializing db schema: ", err)
 		os.Exit(1)

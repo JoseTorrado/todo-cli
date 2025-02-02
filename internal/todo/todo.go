@@ -16,7 +16,6 @@ type item struct {
 	CompletedAt time.Time
 }
 
-// type Todos []item
 type Todos struct {
 	db *DB
 }
@@ -40,37 +39,6 @@ func (t *Todos) Delete(id int) error {
 func (t *Todos) List() ([]item, error) {
 	return t.db.GetAllTodos()
 }
-
-// func (t *Todos) Load(filename string) error {
-// 	file, err := os.ReadFile()
-// 	if err != nil {
-// 		if errors.Is(err, os.ErrNotExist) {
-// 			return nil
-// 		}
-// 		return err
-// 	}
-//
-// 	if len(file) == 0 {
-// 		return nil
-// 	}
-//
-// 	err = json.Unmarshal(file, t)
-// 	if err != nil {
-// 		return err
-// 	}
-//
-// 	return nil
-// }
-//
-// func (t *Todos) Save(filename string) error {
-//
-// 	data, err := json.Marshal(t)
-// 	if err != nil {
-// 		return err
-// 	}
-//
-// 	return os.WriteFile(filename, data, 0644)
-// }
 
 func (t *Todos) Print() error {
 	todos, err := t.db.GetAllTodos()
@@ -118,36 +86,6 @@ func (t *Todos) Print() error {
 	table.Println()
 	return nil
 }
-
-// 	for index, item := range *t {
-// 		index++
-// 		if !item.Done || (item.Done && item.CompletedAt.After(time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 0, 0, 0, 0, time.Now().Location()))) {
-// 			task := blue(item.Task)
-// 			done := blue("No")
-// 			if item.Done {
-// 				task = green(fmt.Sprintf("* %s", item.Task))
-// 				done = green("Yes")
-// 			}
-// 			cells = append(cells, *&[]*simpletable.Cell{
-// 				{Text: fmt.Sprintf("%d", index)},
-// 				{Text: task},
-// 				{Text: done},
-// 				{Text: item.CreatedAt.Format(time.RFC822)},
-// 				{Text: item.CompletedAt.Format(time.RFC822)},
-// 			})
-// 		}
-// 	}
-//
-// 	table.Body = &simpletable.Body{Cells: cells}
-//
-// 	table.Footer = &simpletable.Footer{Cells: []*simpletable.Cell{
-// 		{Align: simpletable.AlignCenter, Span: 5, Text: red(fmt.Sprintf("you have %d pending todos", t.CountPending()))},
-// 	}}
-//
-// 	table.SetStyle(simpletable.StyleUnicode)
-//
-// 	table.Println()
-// }
 
 func (t *Todos) CountPending() int {
 	todos, err := t.db.GetPendingTodos()
