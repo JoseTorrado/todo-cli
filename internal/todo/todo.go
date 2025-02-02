@@ -2,14 +2,10 @@
 package todo
 
 import (
-	"encoding/json"
-	"errors"
 	"fmt"
-	"os"
 	"time"
 
 	"github.com/alexeyco/simpletable"
-	"golang.org/x/text/unicode/rangetable"
 )
 
 type item struct {

@@ -18,6 +18,10 @@ const (
 	todoFileName = ".todos.json"
 )
 
+const (
+	dbName = "todos.db"
+)
+
 func main() {
 
 	// Flexible way to get the same file in the home directory
@@ -26,7 +30,32 @@ func main() {
 		fmt.Println("Error getting current user:", err)
 		return
 	}
-	todoFile := filepath.Join(usr.HomeDir, todoFileName)
+	// todoFile := filepath.Join(usr.HomeDir, todoFileName)
+	dbPath := filepath.Join(usr.HomeDir, ".todo", dbName)
+
+	// Ensure the directory exists
+	err = os.MkdirAll(filepath.Dir(dbPath), 0755)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+
+	// INitialize the DB
+	db, err := todo.NewDB(dbPath)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "Error intializing the databsae: ", err)
+		os.Exit(1)
+	}
+	defer db.Close()
+
+	// INitialize the Schema
+	if err := db.InitSchema(); err != nil {
+		fmt.Fprintln(os.Stderr, "Error intializing db schema: ", err)
+		os.Exit(1)
+	}
+
+	// Create a new Todos instance
+	todos := todo.NewTodos(db)
 
 	add := flag.Bool("add", false, "Add a new todo")
 	complete := flag.Int("done", 0, "Mark a todo as Completed")
@@ -37,13 +66,6 @@ func main() {
 
 	flag.Parse()
 
-	todos := &todo.Todos{}
-
-	if err := todos.Load(todoFile); err != nil {
-		fmt.Fprintln(os.Stderr, err.Error())
-		os.Exit(1)
-	}
-
 	switch {
 	case *add:
 		task, err := getInput(os.Stdin, flag.Args()...)
@@ -52,22 +74,13 @@ func main() {
 			os.Exit(1)
 		}
 
-		todos.Add(task)
-
-		err = todos.Save(todoFile)
-		if err != nil {
+		if err := todos.Add(task); err != nil {
 			fmt.Fprintln(os.Stderr, err.Error())
 			os.Exit(1)
 		}
 
 	case *complete > 0:
 		err := todos.Complete(*complete)
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err.Error())
-			os.Exit(1)
-		}
-
-		err = todos.Save(todoFile)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err.Error())
 			os.Exit(1)
@@ -80,14 +93,11 @@ func main() {
 			os.Exit(1)
 		}
 
-		err = todos.Save(todoFile)
-		if err != nil {
+	case *list:
+		if err := todos.Print(); err != nil {
 			fmt.Fprintln(os.Stderr, err.Error())
 			os.Exit(1)
 		}
-
-	case *list:
-		todos.Print()
 
 	case *standup:
 		tasks, lookbackDate := todos.GetStandupTasks(time.Now())
