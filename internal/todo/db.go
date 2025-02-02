@@ -67,17 +67,8 @@ func (db *DB) DeleteTodo(id int) error {
 	return err
 }
 
-func (db *DB) GetAllTodos() ([]item, error) {
-	rows, err := db.Query(`
-		SELECT
-			id,
-			task,
-			done,
-			created_at,
-			completed_at
-		FROM
-			todos
-		`)
+func (db *DB) scanTodos(query string, args ...interface{}) ([]item, error) {
+	rows, err := db.Query(query, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -97,39 +88,48 @@ func (db *DB) GetAllTodos() ([]item, error) {
 		todos = append(todos, i)
 	}
 	return todos, nil
+
+}
+
+func (db *DB) GetAllTodos() ([]item, error) {
+	return db.scanTodos(`
+		SELECT
+				id,
+				task,
+				done,
+				created_at,
+				completed_at
+		FROM
+				todos
+		`)
 }
 
 func (db *DB) GetCompletedTodos(since time.Time) ([]item, error) {
-	rows, err := db.Query(`
+	return db.scanTodos(`
 		SELECT 
-		id, 
-		task,
-		done,
-		created_at,
-		completedAt
+				id, 
+				task,
+				done,
+				created_at,
+				completedAt
 		FROM 
-		todos
+				todos
 		WHERE
-		done = 1 
-		AND completed_at > ?
+				done = 1 
+				AND completed_at > ?
 		`, since)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
+}
 
-	var todos []item
-	for rows.Next() {
-		var i item
-		var completedAt sql.NullTime
-		err := rows.Scan(&i.ID, &i.Task, &i.Done, &i.CreatedAt, &completedAt)
-		if err != nil {
-			return nil, err
-		}
-		if completedAt.Valid {
-			i.CompletedAt = completedAt.Time
-		}
-		todos = append(todos, i)
-	}
-	return todos, nil
+func (db *DB) GetPendingTodos() ([]item, error) {
+	return db.scanTodos(`
+		SELECT
+				id,
+				task,
+				created_at,
+				completed_at
+		FROM
+				todos 
+		WHERE 
+				done = 0
+		`)
 }
