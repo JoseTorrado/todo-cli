@@ -67,6 +67,7 @@ func (db *DB) DeleteTodo(id int) error {
 	return err
 }
 
+// THis helper function allows to pass any datatype into the query parameters by assigning it the interface type
 func (db *DB) scanTodos(query string, args ...interface{}) ([]item, error) {
 	rows, err := db.Query(query, args...)
 	if err != nil {
