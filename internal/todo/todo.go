@@ -37,15 +37,27 @@ func (t *Todos) Delete(id int) error {
 	return t.db.DeleteTodo(id)
 }
 
+// I dont think this is being used right now...
 func (t *Todos) List() ([]item, error) {
 	return t.db.GetAllTodos()
 }
 
 func (t *Todos) Print() error {
-	todos, err := t.db.GetAllTodos()
+	lookbackDate := time.Now().AddDate(0, 0, -1)
+
+	completedTodos, err := t.db.GetCompletedTodos(lookbackDate)
 	if err != nil {
+		fmt.Errorf("Error loading completed todos: %v", err)
 		return err
 	}
+
+	pendingTodos, err := t.db.GetPendingTodos()
+	if err != nil {
+		fmt.Errorf("Error loading pending todos: %v", err)
+		return err
+	}
+
+	todos := append(completedTodos, pendingTodos...)
 
 	table := simpletable.New()
 	table.Header = &simpletable.Header{

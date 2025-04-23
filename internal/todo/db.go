@@ -135,3 +135,19 @@ func (db *DB) GetPendingTodos() ([]item, error) {
 				done = 0;
 		`)
 }
+
+func (db *DB) GetRecentOrPendingTodos(since time.Time) ([]item, error) {
+	return db.scanTodos(`
+		SELECT 
+				id, 
+				task,
+				done,
+				created_at,
+				completed_at
+		FROM 
+				todos
+		WHERE
+				done = 1
+				AND completed_at > ?;
+		`, since)
+}
