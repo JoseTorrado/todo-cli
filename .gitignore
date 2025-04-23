@@ -28,3 +28,6 @@ go.work.sum
 # Zip files
 *.zip
 *.tar.gz
+
+# Testing files
+*invalidpath
