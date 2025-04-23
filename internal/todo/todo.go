@@ -3,6 +3,7 @@ package todo
 
 import (
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/alexeyco/simpletable"
@@ -125,6 +126,7 @@ func (t *Todos) GetStandupTasks(currentTime time.Time) ([]string, time.Time) {
 func (t *Todos) GetTasks(currentTime time.Time) ([]string, time.Time) {
 	todos, err := t.db.GetPendingTodos()
 	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error getting the pending todos: %v\n", err)
 		return nil, currentTime
 	}
 

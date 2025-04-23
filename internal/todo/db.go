@@ -101,7 +101,7 @@ func (db *DB) GetAllTodos() ([]item, error) {
 				created_at,
 				completed_at
 		FROM
-				todos
+				todos;
 		`)
 }
 
@@ -112,12 +112,12 @@ func (db *DB) GetCompletedTodos(since time.Time) ([]item, error) {
 				task,
 				done,
 				created_at,
-				completedAt
+				completed_at
 		FROM 
 				todos
 		WHERE
-				done = 1 
-				AND completed_at > ?
+				done = 1
+				AND completed_at > ?;
 		`, since)
 }
 
@@ -126,11 +126,12 @@ func (db *DB) GetPendingTodos() ([]item, error) {
 		SELECT
 				id,
 				task,
+				done,
 				created_at,
 				completed_at
 		FROM
 				todos 
 		WHERE 
-				done = 0
+				done = 0;
 		`)
 }
